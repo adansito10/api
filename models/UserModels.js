@@ -3,7 +3,7 @@ import pool from '../config/Db.js';
 class Usuario {
     static async findAll() {
         try {
-            const result = await pool.query('SELECT * FROM USUARIOS');
+            const result = await pool.query('SELECT * FROM USUARIOS WHERE delete_at IS NULL');
             return result.rows;
         } catch (error) {
             console.error('Error en findAll:', error.stack);
@@ -11,11 +11,11 @@ class Usuario {
         }
     }
 
-    static async create({ nombre, correo, contrasena }) {
+    static async create({ nombre, correo, contrasena, imagen }) {
         try {
             const result = await pool.query(
-                'INSERT INTO USUARIOS (nombre, correo, contrasena, create_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP) RETURNING *',
-                [nombre, correo, contrasena]
+                'INSERT INTO USUARIOS (nombre, correo, contrasena, imagen, create_at) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING *',
+                [nombre, correo, contrasena, imagen || '']
             );
             return result.rows[0];
         } catch (error) {
@@ -26,7 +26,7 @@ class Usuario {
 
     static async findById(idUsuario) {
         try {
-            const result = await pool.query('SELECT * FROM USUARIOS WHERE id = $1', [idUsuario]);
+            const result = await pool.query('SELECT * FROM USUARIOS WHERE id = $1 AND delete_at IS NULL', [idUsuario]);
             return result.rows[0];
         } catch (error) {
             console.error('Error en findById:', error.stack);
@@ -44,14 +44,39 @@ class Usuario {
         }
     }
 
-    static async update(idUsuario, { nombre, correo, contrasena }) {
+    static async update(idUsuario, { nombre, correo, contrasena, imagen }) {
         try {
-            const result = await pool.query(
-                `UPDATE USUARIOS 
-                 SET nombre = $1, correo = $2, contrasena = $3, update_at = NOW()
-                 WHERE id = $4 RETURNING *`,
-                [nombre, correo, contrasena, idUsuario]
-            );
+            const updates = [];
+            const values = [];
+            let index = 1;
+
+            if (nombre) {
+                updates.push(`nombre = $${index++}`);
+                values.push(nombre);
+            }
+            if (correo) {
+                updates.push(`correo = $${index++}`);
+                values.push(correo);
+            }
+            if (contrasena) {
+                updates.push(`contrasena = $${index++}`);
+                values.push(contrasena);
+            }
+            if (imagen !== undefined) {
+                updates.push(`imagen = $${index++}`);
+                values.push(imagen || '');
+            }
+
+            updates.push(`update_at = NOW()`);
+
+            if (updates.length === 1) {
+                return null;
+            }
+
+            values.push(idUsuario);
+            const query = `UPDATE USUARIOS SET ${updates.join(', ')} WHERE id = $${index} AND delete_at IS NULL RETURNING *`;
+
+            const result = await pool.query(query, values);
             return result.rows[0];
         } catch (error) {
             console.error('Error en update:', error.stack);

@@ -6,15 +6,15 @@ import ServicioRoutes from './routes/ServiceRoutes.js';
 import EmpleadoRoutes from './routes/EmpleadosRoutes.js';
 import ventaRoutes from './routes/VentasRoutes.js';
 import citaRoutes from './routes/CitasRoutes.js';
-import cors from 'cors'; // Asegúrate de tener cors instalado
+import cors from 'cors'; 
 
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(cors({ origin: '*' })); // Permite solicitudes desde Ionic (emulador)
 
-// Definir las rutas de la API
+app.use(express.json());
+app.use('/uploads', express.static('uploads'));
+app.use(cors({ origin: '*' })); 
+
 app.use('/api', Users);
 app.use('/api', clienteRoutes);
 app.use('/api', ServicioRoutes);
@@ -22,10 +22,10 @@ app.use('/api', EmpleadoRoutes);
 app.use('/api', ventaRoutes);
 app.use('/api', citaRoutes);
 
-// Configuración de Swagger
+
 swaggerDocs(app);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => { // Cambia 'localhost' por '0.0.0.0'
   console.log(`Servidor corriendo en http://0.0.0.0:${PORT}`);
-});
+}); 

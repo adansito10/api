@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt'; // Seguimos usando bcrypt ya que mencionaste que funciona
 import jwt from 'jsonwebtoken';
 import Usuario from '../models/UserModels.js';
 
@@ -20,15 +20,20 @@ class UserController {
     // Crear un nuevo usuario
     static async createUser(req, res) {
         try {
-            const { nombre, correo, contrasena } = req.body;
+            const { nombre, correo, contrasena, imagen } = req.body; // Añadimos imagen
             if (!nombre || !correo || !contrasena) {
                 return res.status(400).json({ error: 'Faltan datos requeridos' });
             }
             const hashedPassword = await bcrypt.hash(contrasena, 10); // Hashea la contraseña
-            const user = await Usuario.create({ nombre, correo, contrasena: hashedPassword });
+            const user = await Usuario.create({ nombre, correo, contrasena: hashedPassword, imagen });
             res.status(201).json({
                 message: 'Usuario creado correctamente',
-                user: user
+                user: {
+                    id: user.id,
+                    nombre: user.nombre,
+                    correo: user.correo,
+                    imagen: user.imagen
+                }
             });
         } catch (error) {
             console.error('Error en createUser:', error.stack);
@@ -66,7 +71,12 @@ class UserController {
             res.json({
                 message: 'Inicio de sesión exitoso',
                 token: token,
-                user: { id: user.id, nombre: user.nombre, correo: user.correo }
+                user: {
+                    id: user.id,
+                    nombre: user.nombre,
+                    correo: user.correo,
+                    imagen: user.imagen // Añadimos la imagen en la respuesta
+                }
             });
         } catch (error) {
             console.error('Error en login:', error.stack);
@@ -94,18 +104,23 @@ class UserController {
     // Actualizar un usuario
     static async updateUser(req, res) {
         try {
-            const { nombre, correo, contrasena } = req.body;
+            const { nombre, correo, contrasena, imagen } = req.body; // Añadimos imagen
             let hashedPassword = contrasena;
             if (contrasena) {
                 hashedPassword = await bcrypt.hash(contrasena, 10); // Hashea solo si se proporciona una nueva contraseña
             }
-            const user = await Usuario.update(req.params.id, { nombre, correo, contrasena: hashedPassword });
+            const user = await Usuario.update(req.params.id, { nombre, correo, contrasena: hashedPassword, imagen });
             if (!user) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
             res.json({
                 message: 'Usuario actualizado correctamente',
-                user: user
+                user: {
+                    id: user.id,
+                    nombre: user.nombre,
+                    correo: user.correo,
+                    imagen: user.imagen
+                }
             });
         } catch (error) {
             console.error('Error en updateUser:', error.stack);

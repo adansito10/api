@@ -6,42 +6,45 @@
  *       type: object
  *       required:
  *         - nombre_servicio
- *         - tipo_servicio
- *         - ubicacion
- *         - precio
- *         - fecha
+ *         - descripcion
+ *         - imagen
  *       properties:
- *         idservicio:
+ *         id:
  *           type: integer
  *           description: ID único del servicio
- *         nombreServicio:
+ *         nombre_servicio:
  *           type: string
  *           description: Nombre del servicio
- *         tipoServicio:
+ *         descripcion:
  *           type: string
- *           description: Tipo del servicio
- *         ubicacion:
+ *           description: Descripción del servicio
+ *         imagen:
  *           type: string
- *           description: Ubicación del servicio
- *         precio:
- *           type: number
- *           format: float
- *           description: Precio del servicio
- *         fecha:
+ *           description: URL de la imagen del servicio
+ *         video:
  *           type: string
- *           format: date
- *           description: Fecha en que se ofrece el servicio
+ *           description: URL del video del servicio (opcional)
  *         created_at:
  *           type: string
  *           format: date-time
  *           description: Fecha de creación del servicio
+ *         update_at:
+ *           type: string
+ *           format: date-time
+ *           description: Fecha de actualización del servicio
+ *         delete_at:
+ *           type: string
+ *           format: date-time
+ *           description: Fecha de eliminación del servicio (soft delete)
  *       example:
- *         idservicio: 1
- *         nombre_servicio: "Limpieza profunda"
- *         tipo_servicio: "Limpieza"
- *         ubicacion: "Sucursal C"
- *         precio: 450.00
- *         fecha: "2024-10-16"
+ *         id: 1
+ *         nombre_servicio: "Paquete de Bodas"
+ *         descripcion: "Explora nuestro paquete de bodas que tenemos para ti."
+ *         imagen: "https://example.com/images/boda4.jpg"
+ *         video: "https://example.com/videos/paquete-bodas.mp4"
+ *         created_at: "2025-03-22T22:38:15.452Z"
+ *         update_at: null
+ *         delete_at: null
  */
 
 /**
@@ -79,7 +82,7 @@
  *             schema:
  *               $ref: '#/components/schemas/Servicio'
  *       400:
- *         description: Error en la solicitud (ta de datos)
+ *         description: Error en la solicitud (falta de datos)
  *       500:
  *         description: Error en el servidor
  * 

@@ -1,11 +1,9 @@
 import Servicio from '../models/ServiciosModel.js';
 
 class ServicioController {
-    // Obtener todos los servicios
     static async getAllServicios(req, res) {
         try {
-            const servicios = await Servicio.findAll();  // Asegúrate de que tu modelo tenga este método
-
+            const servicios = await Servicio.findAll();
             res.json({
                 message: 'Lista de todos los servicios',
                 servicios: servicios
@@ -16,19 +14,15 @@ class ServicioController {
         }
     }
 
-    // Crear un nuevo servicio
     static async createServicio(req, res) {
         try {
-            const { nombre_servicio, tipo_servicio, ubicacion, precio } = req.body;
+            const { nombre_servicio, descripcion, imagen, video } = req.body;
 
-            // Validación de campos requeridos
-            if (!nombre_servicio || !tipo_servicio || !ubicacion || precio === undefined) {
-                return res.status(400).json({ message: "Faltan datos requeridos: nombre_servicio, tipo_servicio, ubicacion, precio" });
+            if (!nombre_servicio || !descripcion || !imagen) {
+                return res.status(400).json({ message: "Faltan datos requeridos: nombre_servicio, descripcion, imagen" });
             }
 
-            // Crear el servicio en la base de datos
-            const servicio = await Servicio.create({ nombre_servicio, tipo_servicio, ubicacion, precio });
-
+            const servicio = await Servicio.create({ nombre_servicio, descripcion, imagen, video });
             res.status(201).json({
                 message: 'Servicio creado correctamente',
                 servicio: servicio
@@ -39,14 +33,12 @@ class ServicioController {
         }
     }
 
-    // Obtener un servicio por ID
     static async getServicioById(req, res) {
         try {
-            const servicio = await Servicio.findById(req.params.id);  // Asegúrate de que tu modelo tenga este método
+            const servicio = await Servicio.findById(req.params.id);
             if (!servicio) {
                 return res.status(404).json({ message: "Servicio no encontrado" });
             }
-
             res.json({
                 message: 'Servicio encontrado correctamente',
                 servicio: servicio
@@ -57,37 +49,33 @@ class ServicioController {
         }
     }
 
-    // Actualizar un servicio
     static async updateServicio(req, res) {
         try {
-            const servicio = await Servicio.update(req.params.id, req.body);  // Asegúrate de que tu modelo tenga este método
-
+            const { nombre_servicio, descripcion, imagen, video } = req.body;
+            const servicio = await Servicio.update(req.params.id, { nombre_servicio, descripcion, imagen, video });
             if (!servicio) {
                 return res.status(404).json({ message: 'Servicio no encontrado' });
             }
-
             res.json({
                 message: 'Servicio actualizado correctamente',
                 servicio: servicio
             });
         } catch (error) {
+            console.error('Error al actualizar servicio:', error);
             res.status(500).json({ error: error.message });
         }
     }
 
-    // Eliminar un servicio
     static async deleteServicio(req, res) {
         try {
             const servicio = await Servicio.findById(req.params.id);
             if (!servicio) {
                 return res.status(404).json({ message: 'Servicio no encontrado' });
             }
-
-            const result = await Servicio.delete(req.params.id);  // Asegúrate de que tu modelo tenga este método
-
+            const result = await Servicio.delete(req.params.id);
             res.json({
                 message: 'Servicio eliminado correctamente',
-                servicio: servicio // Devolver el servicio antes de eliminarlo
+                servicio: servicio
             });
         } catch (error) {
             console.error('Error al eliminar servicio:', error);
